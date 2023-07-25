@@ -1,4 +1,63 @@
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 rm(list=ls())
 
-aaa
+library(dplyr)
+
+data <- readxl::read_excel("Data/Tomate.xlsx", skip = 1,
+                           col_names = c("season","treatment","block","harvest",
+                                         "meanWeight","meanNumber","meanLength","meanWidth"))
+head(data)
+
+data = data %>% mutate(Number = 10*meanNumber)
+
+freq = function(data){
+ tab = table(data)
+ prop.tab = prop.table(tab)
+ names(prop.tab)=NULL
+ 
+ out = cbind(tab,round(prop.tab,2))
+ colnames(out) = c("freq","rel.freq")
+ 
+ return(out)
+}
+
+# var 1: season
+freq(data$season)
+
+# var 2: treatment
+freq(data$treatment)
+
+# var 3: block
+freq(data$block)
+
+# var 4: harvest
+freq(data$harvest)
+
+################################################################################
+# number of fruits
+################################################################################
+
+# means
+
+tmp_byseason = tapply(data$Number,data$season,mean)
+tmp_bytreatment = tapply(data$Number,data$treatment,mean)
+tmp_byblock = tapply(data$Number,data$block,mean)
+tmp_byharvest = tapply(data$Number,data$harvest,mean)
+
+plot(tmp_byseason,type="o")
+plot(tmp_bytreatment,type="o")
+plot(tmp_byblock,type="o")
+plot(tmp_byharvest,type="o")
+
+# standard deviation
+
+tmp_byseason = tapply(data$Number,data$season,sd)
+tmp_bytreatment = tapply(data$Number,data$treatment,sd)
+tmp_byblock = tapply(data$Number,data$block,sd)
+tmp_byharvest = tapply(data$Number,data$harvest,sd)
+
+plot(tmp_byseason,type="o")
+plot(tmp_bytreatment,type="o")
+plot(tmp_byblock,type="o")
+plot(tmp_byharvest,type="o")
+
