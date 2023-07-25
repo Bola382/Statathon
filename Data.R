@@ -33,6 +33,11 @@ freq(data$block)
 # var 4: harvest
 freq(data$harvest)
 
+# summary for numeric data
+summary(data[,5:9])
+
+
+# numeric data by
 ################################################################################
 # number of fruits
 ################################################################################
@@ -104,7 +109,7 @@ plot(tmp_byblock,type="o")
 plot(tmp_byharvest,type="o")
 
 ################################################################################
-# mean weight
+# mean lenght
 ################################################################################
 
 # boxplots
@@ -138,3 +143,37 @@ plot(tmp_bytreatment,type="o")
 plot(tmp_byblock,type="o")
 plot(tmp_byharvest,type="o")
 
+################################################################################
+# mean width
+################################################################################
+
+# boxplots
+
+boxplot(data$meanWidth~data$season)
+boxplot(data$meanWidth~data$treatment)
+boxplot(data$meanWidth~data$block)
+boxplot(data$meanWidth~data$harvest)
+
+# means
+
+tmp_byseason = tapply(data$meanWidth,data$season,mean)
+tmp_bytreatment = tapply(data$meanWidth,data$treatment,mean)
+tmp_byblock = tapply(data$meanWidth,data$block,mean)
+tmp_byharvest = tapply(data$meanWidth,data$harvest,mean)
+
+plot(tmp_byseason,type="o")
+plot(tmp_bytreatment,type="o")
+plot(tmp_byblock,type="o")
+plot(tmp_byharvest,type="o")
+
+# standard deviation
+
+tmp_byseason = tapply(data$meanWidth,data$season,sd)
+tmp_bytreatment = tapply(data$meanWidth,data$treatment,sd)
+tmp_byblock = tapply(data$meanWidth,data$block,sd)
+tmp_byharvest = tapply(data$meanWidth,data$harvest,sd)
+
+plot(tmp_byseason,type="o")
+plot(tmp_bytreatment,type="o")
+plot(tmp_byblock,type="o")
+plot(tmp_byharvest,type="o")
