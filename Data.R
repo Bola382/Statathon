@@ -35,7 +35,7 @@ freq(data$harvest)
 
 # summary for numeric data
 summary(data[,5:9])
-
+cor(data[,5:9])
 
 # numeric data by
 ################################################################################
@@ -49,7 +49,7 @@ boxplot(data$Number~data$treatment)
 boxplot(data$Number~data$block)
 boxplot(data$Number~data$harvest)
 
- # means
+# means
 
 tmp_byseason = tapply(data$Number,data$season,mean)
 tmp_bytreatment = tapply(data$Number,data$treatment,mean)
@@ -177,3 +177,15 @@ plot(tmp_byseason,type="o")
 plot(tmp_bytreatment,type="o")
 plot(tmp_byblock,type="o")
 plot(tmp_byharvest,type="o")
+
+# 
+
+tmp = data %>% filter(season=="P-V") %>% as.data.frame
+tmp_matrix = matrix(NA, nrow = dim(tmp)[1], ncol = 10)
+
+for(i in 1:nrow(tmp_matrix)){
+ for(j in 1:10){
+  tmp_matrix[i,tmp$harvest[i]] = tmp[i,"Number"]
+ }
+}
+
