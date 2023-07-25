@@ -68,3 +68,73 @@ plot(tmp_bytreatment,type="o")
 plot(tmp_byblock,type="o")
 plot(tmp_byharvest,type="o")
 
+################################################################################
+# mean weight
+################################################################################
+
+# boxplots
+
+boxplot(data$meanWeight~data$season)
+boxplot(data$meanWeight~data$treatment)
+boxplot(data$meanWeight~data$block)
+boxplot(data$meanWeight~data$harvest)
+
+# means
+
+tmp_byseason = tapply(data$meanWeight,data$season,mean)
+tmp_bytreatment = tapply(data$meanWeight,data$treatment,mean)
+tmp_byblock = tapply(data$meanWeight,data$block,mean)
+tmp_byharvest = tapply(data$meanWeight,data$harvest,mean)
+
+plot(tmp_byseason,type="o")
+plot(tmp_bytreatment,type="o")
+plot(tmp_byblock,type="o")
+plot(tmp_byharvest,type="o")
+
+# standard deviation
+
+tmp_byseason = tapply(data$meanWeight,data$season,sd)
+tmp_bytreatment = tapply(data$meanWeight,data$treatment,sd)
+tmp_byblock = tapply(data$meanWeight,data$block,sd)
+tmp_byharvest = tapply(data$meanWeight,data$harvest,sd)
+
+plot(tmp_byseason,type="o")
+plot(tmp_bytreatment,type="o")
+plot(tmp_byblock,type="o")
+plot(tmp_byharvest,type="o")
+
+################################################################################
+# mean weight
+################################################################################
+
+# boxplots
+
+boxplot(data$meanLength~data$season)
+boxplot(data$meanLength~data$treatment)
+boxplot(data$meanLength~data$block)
+boxplot(data$meanLength~data$harvest)
+
+# means
+
+tmp_byseason = tapply(data$meanLength,data$season,mean)
+tmp_bytreatment = tapply(data$meanLength,data$treatment,mean)
+tmp_byblock = tapply(data$meanLength,data$block,mean)
+tmp_byharvest = tapply(data$meanLength,data$harvest,mean)
+
+plot(tmp_byseason,type="o")
+plot(tmp_bytreatment,type="o")
+plot(tmp_byblock,type="o")
+plot(tmp_byharvest,type="o")
+
+# standard deviation
+
+tmp_byseason = tapply(data$meanLength,data$season,sd)
+tmp_bytreatment = tapply(data$meanLength,data$treatment,sd)
+tmp_byblock = tapply(data$meanLength,data$block,sd)
+tmp_byharvest = tapply(data$meanLength,data$harvest,sd)
+
+plot(tmp_byseason,type="o")
+plot(tmp_bytreatment,type="o")
+plot(tmp_byblock,type="o")
+plot(tmp_byharvest,type="o")
+
