@@ -37,7 +37,14 @@ freq(data$harvest)
 # number of fruits
 ################################################################################
 
-# means
+# boxplots
+
+boxplot(data$Number~data$season)
+boxplot(data$Number~data$treatment)
+boxplot(data$Number~data$block)
+boxplot(data$Number~data$harvest)
+
+ # means
 
 tmp_byseason = tapply(data$Number,data$season,mean)
 tmp_bytreatment = tapply(data$Number,data$treatment,mean)
