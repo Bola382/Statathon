@@ -5,10 +5,10 @@ library(dplyr)
 
 data <- readxl::read_excel("Data/Tomate.xlsx", skip = 1,
                            col_names = c("season","treatment","block","harvest",
-                                         "meanWeight","meanNumber","meanLength","meanWidth"))
+                                         "Weight","meanNumber","meanLength","meanWidth"))
 head(data)
 
-data = data %>% mutate(Number = 10*meanNumber)
+data = data %>% mutate(Number = 10*meanNumber, meanWeight = Weight/Number)
 
 freq = function(data){
  tab = table(data)
@@ -182,15 +182,57 @@ plot(tmp_byharvest,type="o")
 
 # 1,3,5,7,9
 
-tmp = data %>% filter(harvest==10, season == "P-V")
+tmp = data %>% filter(harvest==10)
+tmp$treatment = tmp$treatment %>% as.factor
+tmp$block = tmp$block %>% as.factor
+
+boxplot(tmp$meanWeight~tmp$treatment)
+vioplot::vioplot(tmp$meanWeight~tmp$treatment)
+
+library(ggplot2)
+p <- ggplot(tmp, aes(x=treatment, y=meanWeight)) + 
+ geom_violin(trim=FALSE) + geom_boxplot(width=0.1)
+p
+
+MVN::mvn(select(tmp,!c(Weight,meanNumber))[,5:8], univariateTest = "SW")
+
+aa = manova(lm(cbind(tmp$meanLength,tmp$meanNumber,tmp$meanWeight,tmp$meanWidth) ~ factor(tmp$block)+factor(tmp$treatment)))
+
+summary(aa)
+
+aa = aov(tmp$meanWeight~factor(tmp$block)+factor(tmp$treatment))
+hist(aa$res)
+shapiro.test(residuals(aa))
+plot(residuals(aa))
+?bartlett.test(aa$res~tmp$treatment)
+bartlett.test(aa$res~tmp$block)
+plot(hnp::hnp(aa))
+lmtest::dwtest(aa)
+
+anova(aa)
 
 tmp_trat = factor(tmp$treatment)
 tmp_block = factor(tmp$block)
 
-xtabs(tmp$meanWeight~tmp_trat+tmp_block)
+xtabs(tmp$Number~tmp_trat+tmp_block)
+
+dumie = makedummies::makedummies(data.frame(tmp_trat,tmp_block))
+dumie = cbind(1,dumie)
+
+mod = glm(tmp$Number~dumie+0, family = poisson())
+m1 <- MASS::glm.nb(tmp$Number~dumie+0)
+m2 = lme4::lmer(meanWeight~(1|treatment)+(1|block),data=tmp)
+
+summary(m1)
+
+hist(m1$res)
+plot(m1$res)
+shapiro.test(m1$res)
+plot(hnp::hnp(m1))
 
 boxplot(tmp$meanWeight~tmp_block)
 
 boxplot(tmp$meanWeight~tmp$treatment)
 aa = lm(tmp$meanWeight~factor(tmp$treatment)+factor(tmp$block))
-plot(residuals(aa,"pearson"))
+
+
