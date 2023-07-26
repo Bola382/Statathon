@@ -178,14 +178,19 @@ plot(tmp_bytreatment,type="o")
 plot(tmp_byblock,type="o")
 plot(tmp_byharvest,type="o")
 
-# 
+# tests
 
-tmp = data %>% filter(season=="P-V") %>% as.data.frame
-tmp_matrix = matrix(NA, nrow = dim(tmp)[1], ncol = 10)
+# 1,3,5,7,9
 
-for(i in 1:nrow(tmp_matrix)){
- for(j in 1:10){
-  tmp_matrix[i,tmp$harvest[i]] = tmp[i,"Number"]
- }
-}
+tmp = data %>% filter(harvest==10, season == "P-V")
 
+tmp_trat = factor(tmp$treatment)
+tmp_block = factor(tmp$block)
+
+xtabs(tmp$meanWeight~tmp_trat+tmp_block)
+
+boxplot(tmp$meanWeight~tmp_block)
+
+boxplot(tmp$meanWeight~tmp$treatment)
+aa = lm(tmp$meanWeight~factor(tmp$treatment)+factor(tmp$block))
+plot(residuals(aa,"pearson"))
