@@ -318,3 +318,37 @@ plot(resid(aa))
 hnp::hnp(aa)
 
 friedman.test(y = tmp_resp, groups = tmp_trat3, blocks = tmp_block3)
+
+# cumulativo
+
+tmp = data %>% filter(season=="O-I")
+tmp$treatment = tmp$alternado %>% as.factor
+tmp$block = tmp$block %>% as.factor
+
+tmp2 = matrix(NA, nrow = 3, ncol = 2)
+
+for(i in 1:3){
+ for(j in 0:1){
+  tmp2[i,j+1] = tmp %>% filter(block==i,treatment==j) %>% select(meanWeight) %>% sum
+ }
+}
+
+tmp_trat3 = factor(rep(0:1,3))
+tmp_block3 = factor(rep(1:3,each=2))
+
+tmp_data3 = data.frame(block = tmp_block3, trat = tmp_trat3, "meanWheight")
+
+for(i in 1:6){
+ tmp_data3[i,3] = tmp2[tmp_data3[i,1],as.numeric(tmp_data3[i,2])]
+}
+
+tmp_resp = as.numeric(tmp_data3$X.meanWheight.)
+
+aa = lm(tmp_resp ~ tmp_trat3+tmp_block3)
+anova(aa)
+
+shapiro.test(resid(aa))
+plot(resid(aa))
+hnp::hnp(aa)
+
+friedman.test(y = tmp_resp, groups = tmp_trat3, blocks = tmp_block3)
