@@ -8,7 +8,10 @@ data <- readxl::read_excel("Data/Tomate.xlsx", skip = 1,
                                          "Weight","meanNumber","meanLength","meanWidth"))
 head(data)
 
-data = data %>% mutate(Number = 10*meanNumber, meanWeight = Weight/Number)
+data = data %>% mutate(success = ifelse(Weight==0,0,1),
+                       Number = 10*meanNumber, 
+                       meanWeight = ifelse(is.nan(Weight/Number),0,Weight/Number),
+                       id = 1:nrow(data))
 
 freq = function(data){
  tab = table(data)
@@ -49,30 +52,6 @@ boxplot(data$Number~data$treatment)
 boxplot(data$Number~data$block)
 boxplot(data$Number~data$harvest)
 
-# means
-
-tmp_byseason = tapply(data$Number,data$season,mean)
-tmp_bytreatment = tapply(data$Number,data$treatment,mean)
-tmp_byblock = tapply(data$Number,data$block,mean)
-tmp_byharvest = tapply(data$Number,data$harvest,mean)
-
-plot(tmp_byseason,type="o")
-plot(tmp_bytreatment,type="o")
-plot(tmp_byblock,type="o")
-plot(tmp_byharvest,type="o")
-
-# standard deviation
-
-tmp_byseason = tapply(data$Number,data$season,sd)
-tmp_bytreatment = tapply(data$Number,data$treatment,sd)
-tmp_byblock = tapply(data$Number,data$block,sd)
-tmp_byharvest = tapply(data$Number,data$harvest,sd)
-
-plot(tmp_byseason,type="o")
-plot(tmp_bytreatment,type="o")
-plot(tmp_byblock,type="o")
-plot(tmp_byharvest,type="o")
-
 ################################################################################
 # mean weight
 ################################################################################
@@ -83,30 +62,6 @@ boxplot(data$meanWeight~data$season)
 boxplot(data$meanWeight~data$treatment)
 boxplot(data$meanWeight~data$block)
 boxplot(data$meanWeight~data$harvest)
-
-# means
-
-tmp_byseason = tapply(data$meanWeight,data$season,mean)
-tmp_bytreatment = tapply(data$meanWeight,data$treatment,mean)
-tmp_byblock = tapply(data$meanWeight,data$block,mean)
-tmp_byharvest = tapply(data$meanWeight,data$harvest,mean)
-
-plot(tmp_byseason,type="o")
-plot(tmp_bytreatment,type="o")
-plot(tmp_byblock,type="o")
-plot(tmp_byharvest,type="o")
-
-# standard deviation
-
-tmp_byseason = tapply(data$meanWeight,data$season,sd)
-tmp_bytreatment = tapply(data$meanWeight,data$treatment,sd)
-tmp_byblock = tapply(data$meanWeight,data$block,sd)
-tmp_byharvest = tapply(data$meanWeight,data$harvest,sd)
-
-plot(tmp_byseason,type="o")
-plot(tmp_bytreatment,type="o")
-plot(tmp_byblock,type="o")
-plot(tmp_byharvest,type="o")
 
 ################################################################################
 # mean lenght
@@ -119,30 +74,6 @@ boxplot(data$meanLength~data$treatment)
 boxplot(data$meanLength~data$block)
 boxplot(data$meanLength~data$harvest)
 
-# means
-
-tmp_byseason = tapply(data$meanLength,data$season,mean)
-tmp_bytreatment = tapply(data$meanLength,data$treatment,mean)
-tmp_byblock = tapply(data$meanLength,data$block,mean)
-tmp_byharvest = tapply(data$meanLength,data$harvest,mean)
-
-plot(tmp_byseason,type="o")
-plot(tmp_bytreatment,type="o")
-plot(tmp_byblock,type="o")
-plot(tmp_byharvest,type="o")
-
-# standard deviation
-
-tmp_byseason = tapply(data$meanLength,data$season,sd)
-tmp_bytreatment = tapply(data$meanLength,data$treatment,sd)
-tmp_byblock = tapply(data$meanLength,data$block,sd)
-tmp_byharvest = tapply(data$meanLength,data$harvest,sd)
-
-plot(tmp_byseason,type="o")
-plot(tmp_bytreatment,type="o")
-plot(tmp_byblock,type="o")
-plot(tmp_byharvest,type="o")
-
 ################################################################################
 # mean width
 ################################################################################
@@ -154,85 +85,98 @@ boxplot(data$meanWidth~data$treatment)
 boxplot(data$meanWidth~data$block)
 boxplot(data$meanWidth~data$harvest)
 
-# means
-
-tmp_byseason = tapply(data$meanWidth,data$season,mean)
-tmp_bytreatment = tapply(data$meanWidth,data$treatment,mean)
-tmp_byblock = tapply(data$meanWidth,data$block,mean)
-tmp_byharvest = tapply(data$meanWidth,data$harvest,mean)
-
-plot(tmp_byseason,type="o")
-plot(tmp_bytreatment,type="o")
-plot(tmp_byblock,type="o")
-plot(tmp_byharvest,type="o")
-
-# standard deviation
-
-tmp_byseason = tapply(data$meanWidth,data$season,sd)
-tmp_bytreatment = tapply(data$meanWidth,data$treatment,sd)
-tmp_byblock = tapply(data$meanWidth,data$block,sd)
-tmp_byharvest = tapply(data$meanWidth,data$harvest,sd)
-
-plot(tmp_byseason,type="o")
-plot(tmp_bytreatment,type="o")
-plot(tmp_byblock,type="o")
-plot(tmp_byharvest,type="o")
-
 # tests
 
-# 1,3,5,7,9
 
-tmp = data %>% filter(harvest==10)
-tmp$treatment = tmp$treatment %>% as.factor
-tmp$block = tmp$block %>% as.factor
 
-boxplot(tmp$meanWeight~tmp$treatment)
-vioplot::vioplot(tmp$meanWeight~tmp$treatment)
-
-library(ggplot2)
-p <- ggplot(tmp, aes(x=treatment, y=meanWeight)) + 
- geom_violin(trim=FALSE) + geom_boxplot(width=0.1)
-p
-
-MVN::mvn(select(tmp,!c(Weight,meanNumber))[,5:8], univariateTest = "SW")
-
-aa = manova(lm(cbind(tmp$meanLength,tmp$meanNumber,tmp$meanWeight,tmp$meanWidth) ~ factor(tmp$block)+factor(tmp$treatment)))
-
-summary(aa)
-
-aa = aov(tmp$meanWeight~factor(tmp$block)+factor(tmp$treatment))
-hist(aa$res)
-shapiro.test(residuals(aa))
-plot(residuals(aa))
-?bartlett.test(aa$res~tmp$treatment)
-bartlett.test(aa$res~tmp$block)
-plot(hnp::hnp(aa))
-lmtest::dwtest(aa)
-
-anova(aa)
-
+# by harvest
+tmp = data %>% filter(season=="P-V", harvest==1)
 tmp_trat = factor(tmp$treatment)
 tmp_block = factor(tmp$block)
 
-xtabs(tmp$Number~tmp_trat+tmp_block)
+friedman.test(y = tmp$meanWeight, groups = tmp$treatment, blocks = tmp$block)
 
-dumie = makedummies::makedummies(data.frame(tmp_trat,tmp_block))
-dumie = cbind(1,dumie)
+tmp = data %>% filter(season=="P-V", harvest==2)
+tmp_trat = factor(tmp$treatment)
+tmp_block = factor(tmp$block)
 
-mod = glm(tmp$Number~dumie+0, family = poisson())
-m1 <- MASS::glm.nb(tmp$Number~dumie+0)
-m2 = lme4::lmer(meanWeight~(1|treatment)+(1|block),data=tmp)
+friedman.test(y = tmp$meanWeight, groups = tmp$treatment, blocks = tmp$block)
 
-summary(m1)
+tmp = data %>% filter(season=="P-V", harvest==3)
+tmp_trat = factor(tmp$treatment)
+tmp_block = factor(tmp$block)
 
-hist(m1$res)
-plot(m1$res)
-shapiro.test(m1$res)
-plot(hnp::hnp(m1))
+friedman.test(y = tmp$meanWeight, groups = tmp$treatment, blocks = tmp$block)
 
-boxplot(tmp$meanWeight~tmp_block)
+tmp = data %>% filter(season=="P-V", harvest==4)
+tmp_trat = factor(tmp$treatment)
+tmp_block = factor(tmp$block)
 
-boxplot(tmp$meanWeight~tmp$treatment)
-aa = lm(tmp$meanWeight~factor(tmp$treatment)+factor(tmp$block))
+friedman.test(y = tmp$meanWeight, groups = tmp$treatment, blocks = tmp$block)
 
+tmp = data %>% filter(season=="P-V", harvest==5)
+tmp_trat = factor(tmp$treatment)
+tmp_block = factor(tmp$block)
 
+friedman.test(y = tmp$meanWeight, groups = tmp$treatment, blocks = tmp$block)
+
+tmp = data %>% filter(season=="P-V", harvest==6)
+tmp_trat = factor(tmp$treatment)
+tmp_block = factor(tmp$block)
+
+friedman.test(y = tmp$meanWeight, groups = tmp$treatment, blocks = tmp$block)
+
+tmp = data %>% filter(season=="P-V", harvest==7)
+tmp_trat = factor(tmp$treatment)
+tmp_block = factor(tmp$block)
+
+friedman.test(y = tmp$meanWeight, groups = tmp$treatment, blocks = tmp$block)
+
+tmp = data %>% filter(season=="P-V", harvest==8)
+tmp_trat = factor(tmp$treatment)
+tmp_block = factor(tmp$block)
+
+friedman.test(y = tmp$meanWeight, groups = tmp$treatment, blocks = tmp$block)
+
+tmp = data %>% filter(season=="P-V", harvest==9)
+tmp_trat = factor(tmp$treatment)
+tmp_block = factor(tmp$block)
+
+friedman.test(y = tmp$meanWeight, groups = tmp$treatment, blocks = tmp$block)
+
+tmp = data %>% filter(season=="P-V", harvest==10)
+tmp_trat = factor(tmp$treatment)
+tmp_block = factor(tmp$block)
+
+friedman.test(y = tmp$meanWeight, groups = tmp$treatment, blocks = tmp$block)
+
+# cumulativo
+tmp = data %>% filter(season=="P-V")
+tmp$treatment = tmp$treatment %>% as.factor
+tmp$block = tmp$block %>% as.factor
+
+tmp2 = array(NA, dim = c(3,12,1))
+
+for(i in 1:3){
+ for(j in 1:12){
+  tmp2[i,j,] = tmp %>% filter(block==i,treatment==j) %>% select(meanWeight) %>%sum
+ }
+}
+
+tmp_trat3 = factor(rep(1:12,3))
+tmp_block3 = factor(rep(1:3,each=12))
+
+tmp_data3 = data.frame(block = tmp_block3, trat = tmp_trat3, "meanWheight")
+
+for(i in 1:36){
+ tmp_data3[i,3] = tmp2[tmp_data3[i,1],tmp_data3[i,2],]
+}
+
+tmp_resp = as.numeric(tmp_data3$X.meanWheight.)
+
+aa = lm(tmp_resp ~ tmp_trat3+tmp_block3)
+anova(aa)
+
+shapiro.test(resid(aa))
+plot(resid(aa))
+hnp::hnp(aa)
