@@ -123,6 +123,26 @@ legend("topright", legend = 2*1:6-1, title = "Tratamento", lty=1, col = col)
 
 tmp = data %>% filter(season=="O-I", harvest==1)
 
+tratamentos_plot <- c(1, 3, 5, 7, 9, 11)
+tmp_filtered <- filter(tmp, treatment %in% tratamentos_plot)
+ggplot(tmp_filtered, aes(y = `meanNumber`, x=as.factor(tmp_filtered$`treatment`),fill = as.factor(tmp_filtered$`treatment`))) +
+  geom_boxplot(show.legend = FALSE)+
+  labs(y = "Peso Médio", x= 'Tratamento')+
+  scale_fill_manual(values = rev(gray.colors(6)))+
+  theme_bw()+
+  scale_x_discrete(breaks = c(1, 3, 5, 7, 9, 11))
+
+tratamentos_plot <- c(2, 4, 6, 8, 10, 12)
+tmp_filtered <- filter(tmp, treatment %in% tratamentos_plot)
+
+ggplot(tmp_filtered, aes(y = `meanNumber`, x=as.factor(tmp_filtered$`treatment`),fill = as.factor(tmp_filtered$`treatment`))) +
+  geom_boxplot(show.legend = FALSE)+
+  labs(y = "Peso Médio", x= 'Tratamento')+
+  scale_fill_manual(values = rev(gray.colors(6)))+
+  theme_bw()+
+  scale_x_discrete(breaks = c(2, 4, 6, 8, 10, 12))
+
+
 boxplot(tmp$meanNumber~tmp$treatment)
 boxplot(tmp$meanNumber~tmp$block)
 
